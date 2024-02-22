@@ -1,6 +1,6 @@
 ### Step 2: Run the Below command to Enable the Dashboard ##
 ```
-kubectl apply -f https://raw.githubusercontent.com/kub...
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
 ```
 ### Step 3: Create users and roles for the dashboard ##
 
