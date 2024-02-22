@@ -41,3 +41,8 @@ clusterrolebinding.rbac.authorization.k8s.io/admin-user created
 ```
 kubectl -n kubernetes-dashboard create token admin-user
 ```
+### Access Dashboard Externally ##
+
+```
+kubectl edit svc kubernetes-dashboard -n kubernetes-dashboard     ## Change type: ClusterIP to NodePort ##
+```
