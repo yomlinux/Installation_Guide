@@ -18,7 +18,6 @@ I am using this Centos ISO image for the Kube Node and worker Nodes
 
 ```
 yum update -y
-
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 setenforce 0
 reboot
@@ -33,6 +32,11 @@ firewall-cmd --permanent --add-port=10251/tcp
 firewall-cmd --permanent --add-port=10252/tcp
 firewall-cmd --permanent --add-port=10255/tcp
 firewall-cmd –reload
+```
+
+```
+swapoff -a 
+sed -i.bak -r 's/(.+ swap .+)/#\1/' /etc/fstab
 modprobe br_netfilter
 echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables
 ```
@@ -87,11 +91,15 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 ### Install Kubeadm and Docker packages
 
 ```	
-yum install kubeadm docker -y 
+sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo systemctl start docker
+sudo service docker status
 
+yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+systemctl enable docker && systemctl start docker 
 systemctl enable kubelet && systemctl start kubelet
 
-kubeadm init
+kubeadm init --pod-network-cidr=10.244.0.0/16
 ```	
 
 ### If you get below error delete the config.toml file and restart containerd service
@@ -130,7 +138,7 @@ sudo kubectl apply -f /root/Linux_guides/kube-flannel.yml
 
 OR
 
-sudo kubectl apply -f https://raw.githubusercontent.com/techarkit/Linux_guides/master/kube-flannel.yml
+kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
 ```	
 
 ```
@@ -203,7 +211,15 @@ systemctl enable kubelet && systemctl start kubelet
 ```
 kubeadm join 192.168.175.200:6443 --token vaki2g.wevj9qs1d6unyj0k         --discovery-token-ca-cert-hash sha256:68c74acbbcea624e2cdbeee4acc1a3feb96f58a53b643476b9f77769e340b98b
 ```
+### Rejoin Command ###
+```
+kubeadm token create --print-join-command
+```
 
+### Setting Variables ###
+```
+export KUBECONFIG=/etc/kubernetes/admin.conf
+```
 ### If you get below error like Kubelet is not running
 ```
 systemctl status kubelet -l
